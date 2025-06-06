@@ -266,6 +266,9 @@ def chat_api():
         # Check if OpenAI service returned an error
         if not response_data.get('content'):
             if response_data.get('error'):
+                # More specific error handling for API key issues
+                if 'api key' in response_data['error'].lower() or 'unauthorized' in response_data['error'].lower():
+                    return jsonify({'error': 'Invalid or expired OpenAI API key. Please check your API key in settings.'}), 401
                 return jsonify({'error': response_data['error']}), 400
             else:
                 return jsonify({'error': 'No response from AI service'}), 500
