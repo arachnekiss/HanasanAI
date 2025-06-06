@@ -361,9 +361,9 @@ class OpenAIService:
         model_mapping = {
             'gpt-4o': 'gpt-4o',
             'gpt-4o-mini': 'gpt-4o-mini',
-            'o4-mini': 'gpt-4o-mini',
-            'o4-mini-high': 'gpt-4o-mini',
-            'o3': 'gpt-4o',  # Fallback to gpt-4o for o3 until available
+            'o4-mini': 'o4-mini',
+            
+            'o3': 'o3',  # Fallback to gpt-4o for o3 until available
             'gpt-3.5-turbo': 'gpt-3.5-turbo'
         }
         return model_mapping.get(model, 'gpt-4o')  # Default to gpt-4o if unknown
