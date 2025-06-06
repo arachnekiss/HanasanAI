@@ -490,6 +490,50 @@ class SimpleChatGPT {
         }
     }
 
+    getCurrentSelectedModel() {
+        // Check if there's a selected model in the model selector
+        const modelSelector = document.querySelector('.model-selector');
+        if (modelSelector) {
+            const selectedOption = modelSelector.querySelector('.model-option.selected');
+            if (selectedOption) {
+                const modelId = selectedOption.getAttribute('data-model-id');
+                if (modelId) {
+                    this.selectedModel = modelId;
+                    return modelId;
+                }
+            }
+        }
+        
+        // Check localStorage for saved model preference
+        const savedModel = localStorage.getItem('selectedModel');
+        if (savedModel) {
+            this.selectedModel = savedModel;
+            return savedModel;
+        }
+        
+        // Return default model
+        return this.selectedModel || 'gpt-4o';
+    }
+
+    setSelectedModel(modelId) {
+        this.selectedModel = modelId;
+        localStorage.setItem('selectedModel', modelId);
+        
+        // Update UI if model selector exists
+        const modelSelector = document.querySelector('.model-selector');
+        if (modelSelector) {
+            const options = modelSelector.querySelectorAll('.model-option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (option.getAttribute('data-model-id') === modelId) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+        
+        console.log('Model selected:', modelId);
+    }
+
     async sendMessage() {
         const messageInput = document.getElementById('messageInput');
         const message = messageInput.value.trim();
@@ -1716,7 +1760,8 @@ class SimpleChatGPT {
     }
 
     selectModel(modelId) {
-        // Update current model
+        // Update current model using the new selection system
+        this.setSelectedModel(modelId);
         this.currentModel = modelId;
         
         // Update UI
@@ -1728,7 +1773,9 @@ class SimpleChatGPT {
             'gpt-4o': 'GPT-4o',
             'gpt-4.5': 'GPT-4.5',
             'o3': 'o3',
-            'gpt-4o-mini': 'GPT-4o mini'
+            'gpt-4o-mini': 'GPT-4o mini',
+            'o4-mini': 'o4-mini',
+            'o4-mini-high': 'o4-mini-high'
         };
         
         if (modelName) {
@@ -1761,7 +1808,9 @@ class SimpleChatGPT {
         });
         
         // Show toast notification
-        this.showToast(`모델이 ${modelTitles[modelId] || 'GPT-4o'}로 전환되었습니다`);
+        this.showToast(`Model switched to ${modelTitles[modelId] || 'GPT-4o'}`);
+        
+        console.log('Model selected and saved:', modelId);
     }
 
     setupSidebar() {
