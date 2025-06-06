@@ -16,6 +16,7 @@ class OpenAIService:
     def _get_client(self, user=None):
         """Get OpenAI client using user's API key - required for all requests"""
         import logging
+        import os
         api_key = None
         
         # Try to get API key from authenticated user
@@ -29,7 +30,12 @@ class OpenAIService:
             if api_key:
                 logging.debug(f"Using session API key: {api_key[:10]}...")
             else:
-                logging.debug("No API key found in session")
+                # Fall back to environment API key for testing
+                api_key = os.environ.get('OPENAI_API_KEY')
+                if api_key:
+                    logging.debug("Using environment API key")
+                else:
+                    logging.debug("No API key found in session or environment")
         
         if api_key:
             return OpenAI(api_key=api_key)
