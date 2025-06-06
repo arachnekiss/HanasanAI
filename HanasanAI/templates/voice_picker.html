@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose a voice - HanasanAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Roboto, sans-serif;
+            background: #000000;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .voice-picker-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 60px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .carousel-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .carousel {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .voice-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-card.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .voice-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 122, 255, 0.3);
+            backdrop-filter: blur(20px);
+        }
+        
+        .voice-avatar.alloy {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+        }
+        
+        .voice-avatar.echo {
+            background: linear-gradient(135deg, #A8E6CF, #88D8C0);
+        }
+        
+        .voice-avatar.fable {
+            background: linear-gradient(135deg, #FFD93D, #6BCF7F);
+        }
+        
+        .voice-avatar.onyx {
+            background: linear-gradient(135deg, #2C3E50, #34495E);
+        }
+        
+        .voice-avatar.nova {
+            background: linear-gradient(135deg, #8E44AD, #3498DB);
+        }
+        
+        .voice-avatar.shimmer {
+            background: linear-gradient(135deg, #F39C12, #E74C3C);
+        }
+        
+        .voice-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .voice-tag {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .dot.active {
+            background: white;
+            transform: scale(1.4);
+        }
+        
+        .cta-container {
+            padding: 20px 0;
+        }
+        
+        .start-chat-btn {
+            width: 100%;
+            height: 56px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 28px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .start-chat-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .start-chat-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="voice-picker-container">
+        <button class="back-btn" id="backBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+        </button>
+        
+        <div class="header">
+            <h1 class="title">Choose a voice</h1>
+        </div>
+        
+        <div class="carousel-container">
+            <div class="carousel" id="carousel">
+                <!-- Voice cards will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="dots-container" id="dotsContainer">
+            <!-- Dots will be populated by JavaScript -->
+        </div>
+        
+        <div class="cta-container">
+            <button class="start-chat-btn" id="startChatBtn">Start new chat</button>
+        </div>
+    </div>
+
+    <script>
+        class VoicePicker {
+            constructor() {
+                this.voices = [
+                    { "id": "alloy", "name": "Alloy", "tag": "warm & friendly" },
+                    { "id": "echo", "name": "Echo", "tag": "bright & clear" },
+                    { "id": "fable", "name": "Fable", "tag": "expressive & dramatic" },
+                    { "id": "onyx", "name": "Onyx", "tag": "deep & resonant" },
+                    { "id": "nova", "name": "Nova", "tag": "youthful & engaging" },
+                    { "id": "shimmer", "name": "Shimmer", "tag": "gentle & soothing" }
+                ];
+                this.currentIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.createVoiceCards();
+                this.createDots();
+                this.setupEventListeners();
+                this.updateDisplay();
+            }
+
+            createVoiceCards() {
+                const carousel = document.getElementById('carousel');
+                carousel.innerHTML = '';
+                
+                this.voices.forEach((voice, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'voice-card';
+                    card.innerHTML = `
+                        <div class="voice-avatar ${voice.id}">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="voice-name">${voice.name}</h3>
+                        <p class="voice-tag">${voice.tag}</p>
+                    `;
+                    carousel.appendChild(card);
+                });
+            }
+
+            createDots() {
+                const dotsContainer = document.getElementById('dotsContainer');
+                dotsContainer.innerHTML = '';
+                
+                this.voices.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    dotsContainer.appendChild(dot);
+                });
+            }
+
+            setupEventListeners() {
+                const backBtn = document.getElementById('backBtn');
+                const startChatBtn = document.getElementById('startChatBtn');
+                const carousel = document.getElementById('carousel');
+                
+                backBtn.addEventListener('click', () => this.goBack());
+                startChatBtn.addEventListener('click', () => this.startNewChat());
+                
+                // Touch/swipe support
+                let startX = 0;
+                let isDragging = false;
+                
+                carousel.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                });
+                
+                carousel.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+                    
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+                    
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                    
+                    isDragging = false;
+                });
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevSlide();
+                    if (e.key === 'ArrowRight') this.nextSlide();
+                    if (e.key === 'Escape') this.goBack();
+                });
+            }
+
+            goToSlide(index) {
+                this.currentIndex = index;
+                this.updateDisplay();
+            }
+
+            nextSlide() {
+                this.currentIndex = (this.currentIndex + 1) % this.voices.length;
+                this.updateDisplay();
+            }
+
+            prevSlide() {
+                this.currentIndex = (this.currentIndex - 1 + this.voices.length) % this.voices.length;
+                this.updateDisplay();
+            }
+
+            updateDisplay() {
+                const cards = document.querySelectorAll('.voice-card');
+                const dots = document.querySelectorAll('.dot');
+                
+                cards.forEach((card, index) => {
+                    if (index === this.currentIndex) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
+                    }
+                });
+                
+                dots.forEach((dot, index) => {
+                    if (index === this.currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+
+            goBack() {
+                window.location.href = '/video_call';
+            }
+
+            startNewChat() {
+                const selectedVoice = this.voices[this.currentIndex];
+                console.log('Selected voice:', selectedVoice);
+                
+                // Store selected voice in localStorage
+                localStorage.setItem('selectedVoice', JSON.stringify(selectedVoice));
+                
+                // Navigate back to video call with new voice
+                window.location.href = '/video_call';
+            }
+        }
+
+        // Initialize voice picker when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoicePicker();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="Choose your plan">Choose your plan - HanasanAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-official.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+    <script src="{{ url_for('static', filename='js/universal-translation.js') }}"></script>
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <button class="back-btn" onclick="window.location.href='/settings'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <h1 class="settings-title" data-translate="Choose your plan">Choose your plan</h1>
+        </header>
+
+        <!-- Content -->
+        <div class="settings-content">
+            {% if current_user.is_authenticated %}
+                {% if current_user.subscription_status == 'premium' %}
+                <!-- Current Premium Plan -->
+                <div class="plan-card current">
+                    <div class="plan-title">HanasanAI Premium</div>
+                    <div class="plan-price" style="line-height: 1.4; margin-bottom: 16px;">
+                        <span data-translate="$20/month auto-renewal">$20/month auto-renewal</span><br>
+                        <span style="font-size: 13px; color: #9ca3af;" data-translate="Unlimited access to all AI models and advanced features">Unlimited access to all AI models and advanced features</span>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                        <button class="settings-row current-plan" disabled>
+                            <span data-translate="Current Plan">Current Plan</span>
+                        </button>
+                        <button class="settings-row cancel-subscription" onclick="cancelSubscription()">
+                            <span data-translate="Cancel Subscription">Cancel Subscription</span>
+                        </button>
+                    </div>
+
+                    <ul class="plan-features">
+                        <li data-translate="Access to all AI models">Access to all AI models</li>
+                        <li data-translate="Unlimited conversations">Unlimited conversations</li>
+                        <li data-translate="Voice recognition and response">Voice recognition and response</li>
+                        <li data-translate="Messenger mode AI first message">Messenger mode AI first message</li>
+                        <li data-translate="Image analysis features">Image analysis features</li>
+                        <li data-translate="Priority response speed">Priority response speed</li>
+                    </ul>
+                </div>
+                {% else %}
+                <!-- Free Plan -->
+                <div class="plan-card current">
+                    <div class="plan-title" data-translate="Free">Free</div>
+                    <div class="plan-price" style="line-height: 1.4; margin-bottom: 16px;">
+                        <span data-translate="$0/month">$0/month</span><br>
+                        <span style="font-size: 13px; color: #9ca3af;" data-translate="Basic features with limited model access">Basic features with limited model access</span>
+                    </div>
+                    
+                    <button class="settings-row current-plan" disabled>
+                        <span data-translate="Current Plan">Current Plan</span>
+                    </button>
+
+                    <ul class="plan-features">
+                        <li data-translate="GPT-4o mini model only">GPT-4o mini model only</li>
+                        <li data-translate="Basic chat functionality">Basic chat functionality</li>
+                        <li data-translate="Messenger mode">Messenger mode</li>
+                        <li style="color: #9ca3af;" data-translate="No access to advanced models">No access to advanced models</li>
+                    </ul>
+                </div>
+
+                <!-- Premium Plan Upgrade -->
+                <div class="plan-card">
+                    <div class="plan-title">HanasanAI Premium</div>
+                    <div class="plan-price" style="line-height: 1.4; margin-bottom: 16px;">
+                        <span data-translate="$20/month auto-renewal">$20/month auto-renewal</span><br>
+                        <span style="font-size: 13px; color: #9ca3af;" data-translate="Unlimited access to all AI models and advanced features">Unlimited access to all AI models and advanced features</span>
+                    </div>
+                    
+                    <div id="paypal-button-container" style="margin-bottom: 16px;"></div>
+
+                    <ul class="plan-features">
+                        <li data-translate="Access to all AI models">Access to all AI models</li>
+                        <li data-translate="Unlimited conversations">Unlimited conversations</li>
+                        <li data-translate="Voice recognition and response">Voice recognition and response</li>
+                        <li data-translate="Messenger mode AI first message">Messenger mode AI first message</li>
+                        <li data-translate="Image analysis features">Image analysis features</li>
+                        <li data-translate="Priority response speed">Priority response speed</li>
+                    </ul>
+                </div>
+                {% endif %}
+            {% else %}
+            <!-- Guest User -->
+            <div class="plan-card">
+                <div class="plan-title" data-translate="Guest Mode">Guest Mode</div>
+                <div class="plan-price" style="line-height: 1.4; margin-bottom: 16px;">
+                    <span data-translate="Limited Access">Limited Access</span><br>
+                    <span style="font-size: 13px; color: #9ca3af;" data-translate="Login to access all features">Login to access all features</span>
+                </div>
+                
+                <button class="settings-row login-button" onclick="window.location.href='/login'">
+                    <span data-translate="Login">Login</span>
+                </button>
+
+                <ul class="plan-features">
+                    <li data-translate="Limited AI model access">Limited AI model access</li>
+                    <li data-translate="Basic chat functionality">Basic chat functionality</li>
+                    <li style="color: #9ca3af;" data-translate="Cannot save conversation history">Cannot save conversation history</li>
+                    <li style="color: #9ca3af;" data-translate="No access to advanced features">No access to advanced features</li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ATurw-yuDl3X9wdmlXBPXd9rFv_jy83_iiqp36ugTU1wzSRbfspXZbuIj_E4YE-evtQnG4dTy-9ETOdC&vault=true&intent=subscription"></script>
+    
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+    <script>
+        // PayPal Subscription Integration
+        {% if current_user.is_authenticated and current_user.subscription_status != 'premium' %}
+        let planId = null;
+        
+        // Create subscription plan first
+        fetch('/create-subscription-plan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                planId = data.plan_id;
+                initPayPalButtons();
+            } else {
+                console.error('Failed to create subscription plan:', data.error);
+            }
+        });
+        
+        function initPayPalButtons() {
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'subscribe'
+                },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': planId
+                    });
+                },
+            onApprove: function(data, actions) {
+                // Handle successful subscription
+                fetch('/subscription/success', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subscriptionID: data.subscriptionID
+                    })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('구독이 성공적으로 활성화되었습니다!');
+                        window.location.reload();
+                    }
+                });
+            },
+            onError: function(err) {
+                console.error('PayPal error:', err);
+                alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        }).render('#paypal-button-container');
+        {% endif %}
+        
+        function cancelSubscription() {
+            if (confirm('정말로 구독을 취소하시겠습니까?')) {
+                fetch('/subscription/cancel', {
+                    method: 'POST'
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('구독이 취소되었습니다.');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

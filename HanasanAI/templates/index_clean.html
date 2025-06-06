@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT - AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-style.css') }}">
+</head>
+<body>
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Top Navigation Header -->
+        <div class="chat-header">
+            <button class="header-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="chat-title">ChatGPT</h1>
+            <div class="header-actions">
+                <button class="header-btn" id="voiceModeBtn" title="Voice conversation">
+                    <i class="fas fa-headphones"></i>
+                </button>
+                <button class="header-btn" id="videoModeBtn" title="Video call mode">
+                    <i class="fas fa-video"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Character Area -->
+        <div class="character-display">
+            <div id="characterCanvas" class="character-canvas"></div>
+            <div class="character-overlay">
+                <div class="character-info">
+                    <span id="characterStatus" class="status-text">Online</span>
+                    <div id="characterEmotion" class="emotion-emoji">😊</div>
+                </div>
+                <button id="bgBtn" class="bg-change-btn">
+                    <i class="fas fa-palette"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Interface -->
+    <div class="input-interface">
+        <div class="input-bar">
+            <button class="attachment-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 115.66 5.66l-9.2 9.19a2 2 0 11-2.83-2.83l8.49-8.48"/>
+                </svg>
+            </button>
+            <input type="text" id="messageInput" placeholder="Message ChatGPT..." readonly>
+            <button class="voice-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                    <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                    <path d="M12 19v4"/>
+                    <path d="M8 23h8"/>
+                </svg>
+            </button>
+            <button class="send-btn" id="sendBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Interface Block -->
+    <div class="content-interface">
+        <div class="interface-content">
+            <!-- Dynamic content area that changes based on state -->
+            <div id="dynamicContent" class="dynamic-content">
+                <!-- Initial state: Suggestions -->
+                <div id="suggestionsView" class="content-view active">
+                    <div class="welcome-text">How can I help you today?</div>
+                    <div class="suggestions-container">
+                        <button class="suggestion-pill" data-prompt="Create an image">Create an image</button>
+                        <button class="suggestion-pill" data-prompt="Analyze data">Analyze data</button>
+                        <button class="suggestion-pill" data-prompt="Help me write">Help me write</button>
+                        <button class="suggestion-pill" data-prompt="Plan a trip">Plan a trip</button>
+                        <button class="suggestion-pill" data-prompt="More">More</button>
+                    </div>
+                </div>
+                
+                <!-- Keyboard/Input state: Virtual keyboard area -->
+                <div id="keyboardView" class="content-view">
+                    <div class="virtual-keyboard">
+                        <!-- First row -->
+                        <div class="keyboard-row">
+                            <button class="key" data-key="q">q</button>
+                            <button class="key" data-key="w">w</button>
+                            <button class="key" data-key="e">e</button>
+                            <button class="key" data-key="r">r</button>
+                            <button class="key" data-key="t">t</button>
+                            <button class="key" data-key="y">y</button>
+                            <button class="key" data-key="u">u</button>
+                            <button class="key" data-key="i">i</button>
+                            <button class="key" data-key="o">o</button>
+                            <button class="key" data-key="p">p</button>
+                        </div>
+                        <!-- Second row -->
+                        <div class="keyboard-row">
+                            <button class="key" data-key="a">a</button>
+                            <button class="key" data-key="s">s</button>
+                            <button class="key" data-key="d">d</button>
+                            <button class="key" data-key="f">f</button>
+                            <button class="key" data-key="g">g</button>
+                            <button class="key" data-key="h">h</button>
+                            <button class="key" data-key="j">j</button>
+                            <button class="key" data-key="k">k</button>
+                            <button class="key" data-key="l">l</button>
+                        </div>
+                        <!-- Third row -->
+                        <div class="keyboard-row">
+                            <button class="key shift-key" data-key="shift">⇧</button>
+                            <button class="key" data-key="z">z</button>
+                            <button class="key" data-key="x">x</button>
+                            <button class="key" data-key="c">c</button>
+                            <button class="key" data-key="v">v</button>
+                            <button class="key" data-key="b">b</button>
+                            <button class="key" data-key="n">n</button>
+                            <button class="key" data-key="m">m</button>
+                            <button class="key backspace-key" data-key="backspace">⌫</button>
+                        </div>
+                        <!-- Fourth row -->
+                        <div class="keyboard-row">
+                            <button class="key number-key" data-key="123">123</button>
+                            <button class="key space-key" data-key=" ">space</button>
+                            <button class="key enter-key" data-key="enter">↵</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Response state: AI response display -->
+                <div id="responseView" class="content-view">
+                    <div id="responseContent" class="response-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/vrm-entry.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/simple-main.js') }}"></script>
+</body>
+</html>

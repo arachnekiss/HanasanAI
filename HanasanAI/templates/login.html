@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="login_title">HanasanAI Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-official.css') }}">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #212121 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #3a3a3a;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            font-size: 14px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+        
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #3a3a3a;
+            background: #333333;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .login-button:hover {
+            background: #404040;
+            border-color: #4a4a4a;
+            transform: translateY(-1px);
+        }
+        
+        .login-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .guest-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #3a3a3a;
+            text-align: center;
+        }
+        
+        .guest-text {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        
+        .guest-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        
+        .guest-button:hover {
+            background: #333333;
+            border-color: #5a5a5a;
+        }
+        
+        .features-list {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #3a3a3a;
+        }
+        
+        .features-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        
+        .feature-check {
+            width: 16px;
+            height: 16px;
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">H</div>
+                <h1 class="login-title">HanasanAI</h1>
+                <p class="login-subtitle">AI 채팅과 캐릭터 상호작용을 경험해보세요</p>
+            </div>
+            
+            <div class="login-buttons">
+                <a href="{{ url_for('google_auth.login') }}" class="login-button">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Google로 계속하기
+                </a>
+            </div>
+            
+            <div class="guest-section">
+                <p class="guest-text">
+                    로그인 없이 체험해보고 싶으신가요?
+                </p>
+                <a href="{{ url_for('index') }}" class="guest-button">
+                    게스트로 체험하기
+                </a>
+            </div>
+            
+            <div class="features-list">
+                <h3 class="features-title">HanasanAI 기능</h3>
+                <div class="feature-item">
+                    <svg class="feature-check" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    AI 캐릭터와 실시간 대화
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-check" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    음성 인식 및 응답
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-check" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    메신저 모드 채팅
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-check" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    이미지 분석 및 대화
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

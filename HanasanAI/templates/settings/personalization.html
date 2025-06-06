@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="personalization">Personalization - HanasanAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-official.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <button class="back-btn" onclick="window.location.href='/settings'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <h1 class="settings-title" data-i18n="personalization">Personalization</h1>
+        </header>
+
+        <!-- Content -->
+        <div class="settings-content">
+            <!-- Custom Instructions -->
+            <div class="settings-section">
+                
+                <div class="settings-row clickable" onclick="openCustomModal()">
+                    <div class="settings-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="settings-text">
+                        <div class="settings-label" data-translate="Custom Instructions">Custom Instructions</div>
+                        <div class="section-description" style="margin-top: 4px; margin-bottom: 0; font-size: 13px; line-height: 1.4;">
+                            <span id="customInstructionsPreview" data-translate="Tell HanasanAI about your preferences and context">Tell HanasanAI about your preferences and context...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appearance -->
+            <div class="settings-section">
+                
+                <!-- Language -->
+                <div class="settings-row clickable" onclick="showLanguageModal()">
+                    <div class="settings-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2 12H22" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="settings-text">
+                        <div class="settings-label" data-translate="Language">Language</div>
+                        <div class="section-description" style="margin-top: 4px; margin-bottom: 0; font-size: 13px; line-height: 1.4;">
+                            <span id="languageDisplay" data-translate="English">English</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Instructions Modal -->
+    <div id="customInstructionsModal" onclick="closeCustomModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 999999; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
+        <div onclick="event.stopPropagation()" style="background: #2a2a2a; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #3a3a3a; flex-shrink: 0;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #ffffff;" data-translate="Custom Instructions">Custom Instructions</h3>
+                <button onclick="closeCustomModal()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+            </div>
+            <div style="padding: 20px; overflow-y: auto; flex: 1;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #ffffff; margin-bottom: 8px;" data-translate="What would you like HanasanAI to know about you?">What would you like HanasanAI to know about you?</label>
+                    <textarea id="aboutYouText" data-translate-placeholder="Tell me about your background, interests, goals..." placeholder="Tell me about your background, interests, goals..." maxlength="1500" oninput="updateCharCounts()" style="width: 100%; height: 80px; background-color: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
+                    <div style="text-align: right; font-size: 12px; color: #6b7280; margin-top: 4px;"><span id="aboutYouCount">0</span>/1500</div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #ffffff; margin-bottom: 8px;" data-translate="How would you like HanasanAI to respond?">How would you like HanasanAI to respond?</label>
+                    <textarea id="responseStyleText" data-translate-placeholder="Specify tone, style, format preferences..." placeholder="Specify tone, style, format preferences..." maxlength="1500" oninput="updateCharCounts()" style="width: 100%; height: 80px; background-color: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 8px; padding: 12px; color: #ffffff; font-size: 14px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
+                    <div style="text-align: right; font-size: 12px; color: #6b7280; margin-top: 4px;"><span id="responseStyleCount">0</span>/1500</div>
+                </div>
+            </div>
+            <div style="padding: 16px 20px; border-top: 1px solid #3a3a3a; flex-shrink: 0;">
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeCustomModal()" style="padding: 10px 20px; background-color: #3a3a3a; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" data-translate="Cancel">Cancel</button>
+                    <button onclick="saveCustomData()" style="padding: 10px 20px; background-color: #10a37f; color: #ffffff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" data-translate="Save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Language Selection Modal -->
+    <div class="modal-overlay" id="languageModal" onclick="hideLanguageModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 data-translate="Language">Language</h3>
+                <button class="modal-close" onclick="hideLanguageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="language-option" onclick="selectLanguage('en', 'English')">
+                    <div class="radio-button" id="radio-en"></div>
+                    <span data-translate="English">English</span>
+                </div>
+                <div class="language-option" onclick="selectLanguage('ja', '日本語')">
+                    <div class="radio-button" id="radio-ja"></div>
+                    <span>日本語</span>
+                </div>
+                <div class="language-option" onclick="selectLanguage('ko', '한국어')">
+                    <div class="radio-button" id="radio-ko"></div>
+                    <span>한국어</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/universal-translation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/personalization.js') }}"></script>
+    <script>
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        let currentLang = localStorage.getItem('language') || 'en';
+        let customInstructions = {
+            aboutYou: localStorage.getItem('customInstructions_aboutYou') || '',
+            responseStyle: localStorage.getItem('customInstructions_responseStyle') || ''
+        };
+
+        // Open custom modal
+        function openCustomModal() {
+            const modal = document.getElementById('customInstructionsModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadCustomData();
+        }
+
+        // Close custom modal
+        function closeCustomModal() {
+            const modal = document.getElementById('customInstructionsModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Load existing custom instructions
+        async function loadCustomData() {
+            try {
+                const response = await fetch('/api/custom-instructions');
+                if (response.ok) {
+                    const data = await response.json();
+                    const aboutField = document.getElementById('aboutYouText');
+                    const styleField = document.getElementById('responseStyleText');
+                    
+                    if (aboutField) aboutField.value = data.about_you || '';
+                    if (styleField) styleField.value = data.response_style || '';
+                    
+                    updateCharCounts();
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+            }
+        }
+
+        // Update character counts
+        function updateCharCounts() {
+            const aboutField = document.getElementById('aboutYouText');
+            const styleField = document.getElementById('responseStyleText');
+            const aboutCount = document.getElementById('aboutYouCount');
+            const styleCount = document.getElementById('responseStyleCount');
+            
+            if (aboutField && aboutCount) aboutCount.textContent = aboutField.value.length;
+            if (styleField && styleCount) styleCount.textContent = styleField.value.length;
+        }
+
+        // Save custom instructions data
+        async function saveCustomData() {
+            const aboutField = document.getElementById('aboutYouText');
+            const styleField = document.getElementById('responseStyleText');
+            
+            const data = {
+                about_you: aboutField ? aboutField.value : '',
+                response_style: styleField ? styleField.value : ''
+            };
+            
+            try {
+                const response = await fetch('/api/custom-instructions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeCustomModal();
+                    showToast('Custom instructions saved successfully!', 'success');
+                    updatePreviewText(data.about_you);
+                } else {
+                    showToast('Failed to save custom instructions', 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Failed to save custom instructions', 'error');
+            }
+        }
+
+        // Update preview text
+        function updatePreviewText(aboutText) {
+            const preview = document.getElementById('customInstructionsPreview');
+            if (preview) {
+                if (aboutText && aboutText.trim()) {
+                    const shortText = aboutText.length > 60 ? aboutText.substring(0, 60) + '...' : aboutText;
+                    preview.textContent = shortText;
+                } else {
+                    preview.textContent = 'Tell HanasanAI about your preferences and context...';
+                }
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10a37f' : '#dc2626'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 999999;
+                font-size: 14px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.style.opacity = '1', 10);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Handle keyboard events
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('customInstructionsModal');
+                if (modal && modal.style.display === 'flex') {
+                    closeCustomModal();
+                }
+            }
+        });
+
+        // Initialize immediately to prevent blank screen
+        function initializePersonalization() {
+            // Update current language from storage
+            currentLang = localStorage.getItem('language') || 'en';
+            currentTheme = localStorage.getItem('theme') || 'dark';
+            
+            updateThemeDisplay();
+            updateLanguageDisplay();
+            updateCustomInstructionsPreview();
+            
+            // Make functions globally available
+            window.showThemeModal = showThemeModal;
+            window.showLanguageModal = showLanguageModal;
+            window.openCustomModal = openCustomModal;
+            window.hideThemeModal = hideThemeModal;
+            window.hideLanguageModal = hideLanguageModal;
+            window.closeCustomModal = closeCustomModal;
+            window.selectTheme = selectTheme;
+            window.selectLanguage = selectLanguage;
+            window.saveCustomData = saveCustomData;
+            
+            console.log('Personalization initialized');
+        }
+
+        // Initialize as soon as possible
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePersonalization);
+        } else {
+            initializePersonalization();
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                animation: slideIn 0.3s ease;
+                font-size: 14px;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function updateThemeDisplay() {
+            const themeNames = { dark: 'Dark', light: 'Light', auto: 'Auto' };
+            document.getElementById('themeDisplay').textContent = themeNames[currentTheme];
+            document.getElementById('currentTheme').textContent = themeNames[currentTheme] + ' Mode';
+            
+            // Apply theme
+            document.body.setAttribute('data-theme', currentTheme);
+        }
+
+        function updateLanguageDisplay() {
+            const langNames = { en: 'English', ja: '日本語', ko: '한국어' };
+            const displayElement = document.getElementById('languageDisplay');
+            if (displayElement) {
+                displayElement.textContent = langNames[currentLang];
+            }
+        }
+
+        function updateLanguageRadios() {
+            document.querySelectorAll('#languageModal .radio-button').forEach(radio => {
+                radio.classList.remove('active');
+            });
+            const activeRadio = document.getElementById(`radio-${currentLang}`);
+            if (activeRadio) {
+                activeRadio.classList.add('active');
+            }
+        }
+
+        function updateCustomInstructionsPreview() {
+            const preview = document.getElementById('customInstructionsPreview');
+            if (preview) {
+                if (customInstructions.aboutYou || customInstructions.responseStyle) {
+                    const previewText = customInstructions.aboutYou.substring(0, 60) + 
+                        (customInstructions.aboutYou.length > 60 ? '...' : '');
+                    preview.textContent = previewText || 'Custom instructions configured';
+                } else {
+                    preview.textContent = 'Tell HanasanAI about your preferences and context...';
+                }
+            }
+        }
+
+        function showCustomInstructionsModal() {
+            const modal = document.getElementById('customInstructionsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                const aboutYouText = document.getElementById('aboutYouText');
+                const responseStyleText = document.getElementById('responseStyleText');
+                if (aboutYouText) aboutYouText.value = customInstructions.aboutYou;
+                if (responseStyleText) responseStyleText.value = customInstructions.responseStyle;
+                updateAboutYouCount();
+                updateResponseStyleCount();
+            }
+        }
+
+        function hideCustomInstructionsModal(event) {
+            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('modal-close')) {
+                const modal = document.getElementById('customInstructionsModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+
+        async function saveCustomInstructions() {
+            const aboutYouText = document.getElementById('aboutYouText');
+            const responseStyleText = document.getElementById('responseStyleText');
+            
+            customInstructions.aboutYou = aboutYouText ? aboutYouText.value : '';
+            customInstructions.responseStyle = responseStyleText ? responseStyleText.value : '';
+            
+            localStorage.setItem('customInstructions_aboutYou', customInstructions.aboutYou);
+            localStorage.setItem('customInstructions_responseStyle', customInstructions.responseStyle);
+            
+            // Save to backend
+            try {
+                const response = await fetch('/api/custom-instructions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        about_you: customInstructions.aboutYou,
+                        response_style: customInstructions.responseStyle
+                    })
+                });
+                
+                if (response.ok) {
+                    updateCustomInstructionsPreview();
+                    hideCustomInstructionsModal();
+                    showToast('Custom instructions saved successfully!', 'success');
+                } else {
+                    showToast('Failed to save custom instructions', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving custom instructions:', error);
+                showToast('Failed to save custom instructions', 'error');
+            }
+        }
+
+        function updateAboutYouCount() {
+            const aboutYouText = document.getElementById('aboutYouText');
+            const aboutYouCount = document.getElementById('aboutYouCount');
+            if (aboutYouText && aboutYouCount) {
+                aboutYouCount.textContent = aboutYouText.value.length;
+            }
+        }
+
+        function updateResponseStyleCount() {
+            const responseStyleText = document.getElementById('responseStyleText');
+            const responseStyleCount = document.getElementById('responseStyleCount');
+            if (responseStyleText && responseStyleCount) {
+                responseStyleCount.textContent = responseStyleText.value.length;
+            }
+        }
+
+        function showThemeModal() {
+            const modal = document.getElementById('themeModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                updateThemeRadios();
+            }
+        }
+
+        function hideThemeModal(event) {
+            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('modal-close')) {
+                const modal = document.getElementById('themeModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+
+        function selectTheme(theme, themeName) {
+            currentTheme = theme;
+            localStorage.setItem('theme', theme);
+            updateThemeDisplay();
+            updateThemeRadios();
+            applyTheme(theme);
+            hideThemeModal();
+            showToast(`Theme changed to ${theme}`, 'success');
+        }
+        
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Apply theme colors immediately
+            if (theme === 'light') {
+                document.body.style.backgroundColor = '#ffffff';
+                document.body.style.color = '#000000';
+                document.querySelectorAll('.settings-container').forEach(el => {
+                    el.style.backgroundColor = '#ffffff';
+                    el.style.color = '#000000';
+                });
+                document.querySelectorAll('.settings-header').forEach(el => {
+                    el.style.backgroundColor = '#f8f9fa';
+                });
+            } else if (theme === 'dark') {
+                document.body.style.backgroundColor = '#212121';
+                document.body.style.color = '#ffffff';
+                document.querySelectorAll('.settings-container').forEach(el => {
+                    el.style.backgroundColor = '#212121';
+                    el.style.color = '#ffffff';
+                });
+                document.querySelectorAll('.settings-header').forEach(el => {
+                    el.style.backgroundColor = '#212121';
+                });
+            } else if (theme === 'auto') {
+                // Use system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+                return;
+            }
+            
+            // Save to backend
+            fetch('/api/user-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme: theme })
+            });
+        }
+
+        function updateThemeRadios() {
+            document.querySelectorAll('#themeModal .radio-button').forEach(radio => {
+                radio.classList.remove('active');
+            });
+            const activeRadio = document.getElementById(`radio-${currentTheme}`);
+            if (activeRadio) {
+                activeRadio.classList.add('active');
+            }
+        }
+
+        function showLanguageModal() {
+            const modal = document.getElementById('languageModal');
+            if (modal) {
+                modal.classList.add('show');
+                updateLanguageRadios();
+            }
+        }
+
+        function hideLanguageModal(event) {
+            if (!event || event.target.classList.contains('modal-overlay') || event.target.classList.contains('modal-close')) {
+                document.getElementById('languageModal').classList.remove('show');
+            }
+        }
+
+        function selectLanguage(lang, langName) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            updateLanguageDisplay();
+            updateLanguageRadios();
+            
+            // Use comprehensive translator
+            if (window.comprehensiveTranslator) {
+                window.comprehensiveTranslator.setLanguageAndTranslate(lang);
+            } else if (window.translateToLanguage) {
+                window.translateToLanguage(lang);
+            }
+            
+            // Save to backend
+            fetch('/api/user-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: lang })
+            });
+            
+            hideLanguageModal();
+            showToast(`Language changed to ${langName}`, 'success');
+        }
+        
+        function translatePage(lang) {
+            const translations = {
+                'en': {
+                    'Personalization': 'Personalization',
+                    'Custom instructions': 'Custom instructions',
+                    'What would you like HanasanAI to know about you?': 'What would you like HanasanAI to know about you?',
+                    'Tell HanasanAI about your preferences and context...': 'Tell HanasanAI about your preferences and context...',
+                    'Appearance': 'Appearance',
+                    'Language': 'Language',
+                    'Interface language for the app': 'Interface language for the app',
+                    'English': 'English',
+                    'Save': 'Save',
+                    'Cancel': 'Cancel',
+                    'What would you like ChatGPT to know about you to provide better responses?': 'What would you like ChatGPT to know about you to provide better responses?',
+                    'How would you like ChatGPT to respond?': 'How would you like ChatGPT to respond?'
+                },
+                'ja': {
+                    'Personalization': 'パーソナライゼーション',
+                    'Custom instructions': 'カスタム指示',
+                    'What would you like HanasanAI to know about you?': 'HanasanAIに何を知ってもらいたいですか？',
+                    'Tell HanasanAI about your preferences and context...': 'HanasanAIにあなたの好みや状況を教えてください...',
+                    'Appearance': '外観',
+                    'Language': '言語',
+                    'Interface language for the app': 'アプリのインターフェース言語',
+                    'English': '英語',
+                    'Save': '保存',
+                    'Cancel': 'キャンセル',
+                    'What would you like ChatGPT to know about you to provide better responses?': 'より良い回答を提供するために、ChatGPTにあなたについて何を知ってもらいたいですか？',
+                    'How would you like ChatGPT to respond?': 'ChatGPTにどのように応答してもらいたいですか？'
+                },
+                'ko': {
+                    'Personalization': '개인화',
+                    'Custom instructions': '사용자 지정 지침',
+                    'What would you like HanasanAI to know about you?': 'HanasanAI가 당신에 대해 무엇을 알기를 원하시나요?',
+                    'Tell HanasanAI about your preferences and context...': 'HanasanAI에게 당신의 선호도와 상황을 알려주세요...',
+                    'Appearance': '외관',
+                    'Language': '언어',
+                    'Interface language for the app': '앱의 인터페이스 언어',
+                    'English': '영어',
+                    'Save': '저장',
+                    'Cancel': '취소',
+                    'What would you like ChatGPT to know about you to provide better responses?': '더 나은 응답을 제공하기 위해 ChatGPT가 당신에 대해 무엇을 알기를 원하시나요?',
+                    'How would you like ChatGPT to respond?': 'ChatGPT가 어떻게 응답하기를 원하시나요?',
+                    'characters': '글자',
+                    'Close': '닫기',
+                    '日本語': '일본어',
+                    '한국어': '한국어'
+                }
+            };
+            
+            const currentTranslations = translations[lang] || translations['en'];
+            
+            // Translate all text content
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (currentTranslations[key]) {
+                    element.textContent = currentTranslations[key];
+                }
+            });
+            
+            // Translate specific elements by text content
+            document.querySelectorAll('*').forEach(element => {
+                if (element.children.length === 0) {
+                    const text = element.textContent.trim();
+                    if (currentTranslations[text]) {
+                        element.textContent = currentTranslations[text];
+                    }
+                }
+                
+                // Translate placeholders
+                if (element.placeholder && currentTranslations[element.placeholder]) {
+                    element.placeholder = currentTranslations[element.placeholder];
+                }
+                
+                // Translate titles and alt text
+                if (element.title && currentTranslations[element.title]) {
+                    element.title = currentTranslations[element.title];
+                }
+                
+                // Translate value attributes for buttons
+                if (element.value && currentTranslations[element.value]) {
+                    element.value = currentTranslations[element.value];
+                }
+            });
+            
+            // Update language display
+            updateLanguageDisplay();
+        }
+
+        function updateLanguageRadios() {
+            document.querySelectorAll('#languageModal .radio-button').forEach(radio => {
+                radio.classList.remove('active');
+            });
+            const activeRadio = document.getElementById(`radio-${currentLang}`);
+            if (activeRadio) {
+                activeRadio.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

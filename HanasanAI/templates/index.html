@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HanasanAI - AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-official.css') }}">
+    <script src="{{ url_for('static', filename='js/comprehensive-translation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vrm-facial-animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vrm-animation-system.js') }}"></script>
+
+    
+    <script>
+        // Pass server-selected assets to JavaScript
+        window.characterModel = '{{ character_model }}';
+        window.backgroundImage = '{{ background_image }}';
+        // VRM and wallpaper lists for random selection
+        window.vrmList = {{ vrm_list|safe }};
+        window.wpList = {{ wp_list|safe }};
+    </script>
+
+</head>
+<body>
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Top Navigation Header -->
+        <div class="chat-header">
+            <div class="header-left-group">
+                <button class="header-btn" id="menuBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/>
+                    </svg>
+                </button>
+                <span class="app-title">HanasanAI</span>
+            </div>
+            <div class="chat-title-container">
+            </div>
+            <button class="header-btn" id="menuDotsBtn" title="Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Character Area -->
+        <div class="character-display" id="avatarContainer" 
+             {% if background_image %}style="background: url('/static/wallpaper/{{ background_image }}') center center/cover no-repeat;"{% endif %}>
+            <canvas id="vrm-canvas" class="character-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Input Interface -->
+    <div class="input-interface">
+        <div class="input-text-row">
+            <input type="text" id="messageInput" placeholder="Message HanasanAI..." data-i18n="message_placeholder" readonly>
+        </div>
+        <div class="input-buttons-row">
+            <button class="input-action-btn" id="attachBtn" title="Attach Image" data-i18n="attach_image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-2.5Z"/>
+                </svg>
+            </button>
+            <button class="input-action-btn" id="messengerBtn" title="Messenger Mode" data-i18n="messenger_mode">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-4h-5c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6v1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V12c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4c1.11 0 2.11-.45 2.83-1.18.37.75 1.16 1.18 2.17 1.18 1.38 0 2.5-1.12 2.5-2.5V12c0-5.52-4.48-10-10-10z"/>
+                </svg>
+            </button>
+            <div class="input-spacer"></div>
+            <button class="input-action-btn" id="voiceInputBtn" title="Voice Input" data-i18n="voice_input">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z M17.3 11c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                </svg>
+            </button>
+            <button class="input-action-btn" id="videoCallBtn" title="Video Call Mode" data-i18n="video_call_mode">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Interface Block -->
+    <div class="content-interface">
+        <div class="interface-content">
+            <!-- Dynamic content area that changes based on state -->
+            <div id="dynamicContent" class="dynamic-content">
+                <!-- Initial state: Suggestions -->
+                <div id="suggestionsView" class="content-view active">
+                    <div class="suggestions-container">
+                        <button class="suggestion-pill" data-prompt="Code review" data-i18n-prompt="code_review"><i class="fas fa-code"></i> <span data-i18n="code_review">Code review</span></button>
+                        <button class="suggestion-pill" data-prompt="Summarize text" data-i18n-prompt="summarize_text"><i class="fas fa-file-text"></i> <span data-i18n="summarize_text">Summarize text</span></button>
+                        <button class="suggestion-pill" data-prompt="Analyze data" data-i18n-prompt="analyze_data"><i class="fas fa-chart-bar"></i> <span data-i18n="analyze_data">Analyze data</span></button>
+                        <button class="suggestion-pill" data-prompt="Brainstorm ideas" data-i18n-prompt="brainstorm"><i class="fas fa-lightbulb"></i> <span data-i18n="brainstorm">Brainstorm ideas</span></button>
+                        <button class="suggestion-pill" data-prompt="Type directly" data-i18n-prompt="type_directly"><span data-i18n="type_directly">Type directly</span></button>
+                    </div>
+                </div>
+                
+                <!-- Keyboard/Input state: Virtual keyboard area -->
+                <div id="keyboardView" class="content-view">
+                    <div class="virtual-keyboard">
+                        <!-- First row -->
+                        <div class="keyboard-row">
+                            <button class="key" data-key="q">q</button>
+                            <button class="key" data-key="w">w</button>
+                            <button class="key" data-key="e">e</button>
+                            <button class="key" data-key="r">r</button>
+                            <button class="key" data-key="t">t</button>
+                            <button class="key" data-key="y">y</button>
+                            <button class="key" data-key="u">u</button>
+                            <button class="key" data-key="i">i</button>
+                            <button class="key" data-key="o">o</button>
+                            <button class="key" data-key="p">p</button>
+                        </div>
+                        <!-- Second row -->
+                        <div class="keyboard-row">
+                            <button class="key" data-key="a">a</button>
+                            <button class="key" data-key="s">s</button>
+                            <button class="key" data-key="d">d</button>
+                            <button class="key" data-key="f">f</button>
+                            <button class="key" data-key="g">g</button>
+                            <button class="key" data-key="h">h</button>
+                            <button class="key" data-key="j">j</button>
+                            <button class="key" data-key="k">k</button>
+                            <button class="key" data-key="l">l</button>
+                        </div>
+                        <!-- Third row -->
+                        <div class="keyboard-row">
+                            <button class="key shift-key" data-key="shift">⇧</button>
+                            <button class="key" data-key="z">z</button>
+                            <button class="key" data-key="x">x</button>
+                            <button class="key" data-key="c">c</button>
+                            <button class="key" data-key="v">v</button>
+                            <button class="key" data-key="b">b</button>
+                            <button class="key" data-key="n">n</button>
+                            <button class="key" data-key="m">m</button>
+                            <button class="key backspace-key" data-key="backspace">⌫</button>
+                        </div>
+                        <!-- Fourth row -->
+                        <div class="keyboard-row">
+                            <button class="key number-key" data-key="123">123</button>
+                            <button class="key space-key" data-key=" ">space</button>
+                            <button class="key enter-key" data-key="enter">↵</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Response state: AI response display -->
+                <div id="responseView" class="content-view">
+                    <div class="ai-response-container">
+                        <div class="ai-response-text" id="aiResponseText"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Selector Modal -->
+    <div id="modelSelectorModal" class="modal-overlay">
+        <div class="model-sheet">
+            <div class="model-sheet-header">
+                <div class="model-sheet-actions" id="modelSheetActions">
+                    <button class="info-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                        </svg>
+                        <span data-translate="View details">View details</span>
+                    </button>
+                    <button class="rename-btn" id="renameModelBtn" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                        <span data-translate="Rename">Rename</span>
+                    </button>
+                    <button class="delete-btn" id="deleteModelBtn" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                        <span data-translate="Delete">Delete</span>
+                    </button>
+                </div>
+            </div>
+            <div class="model-list">
+                <div class="model-item selected" data-model="gpt-4o">
+                    <div class="model-info">
+                        <div class="model-title">GPT-4o</div>
+                        <div class="model-subtitle" data-translate="Great for most tasks">Great for most tasks</div>
+                    </div>
+                    <div class="model-check">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="model-item" data-model="gpt-4o-mini">
+                    <div class="model-info">
+                        <div class="model-title">GPT-4o mini</div>
+                        <div class="model-subtitle" data-translate="Fastest and most efficient">Fastest and most efficient</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="o4-mini">
+                    <div class="model-info">
+                        <div class="model-title">o4-mini</div>
+                        <div class="model-subtitle" data-translate="Faster reasoning for coding, math, and science">Faster reasoning for coding, math, and science</div>
+                    </div>
+                </div>
+                <div class="model-item" data-model="o3">
+                    <div class="model-info">
+                        <div class="model-title">o3</div>
+                        <div class="model-subtitle" data-translate="Uses advanced reasoning">Uses advanced reasoning</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Drawer -->
+    <div id="sidebarDrawer" class="sidebar-overlay">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <div class="header-row">
+                    <div class="search-bar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        <input type="text" placeholder="Search" id="sidebarSearch" data-translate-placeholder="Search">
+                    </div>
+                    <button class="new-chat-icon-btn" id="newChatBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-body">
+                <div class="sidebar-brand">
+                    <img src="{{ url_for('static', filename='img/HanasanAI.svg') }}" alt="HanasanAI" class="sidebar-logo">
+                    <span class="sidebar-brand-text">HanasanAI</span>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="section-title" data-translate="Chat History">Chat History</h3>
+                    <div id="chatHistoryContainer">
+                        <div class="empty-state" id="emptyState">
+                            <p data-translate="No saved chats">No saved chats</p>
+                        </div>
+                        <div id="chatHistoryList" style="display: none;">
+                            <!-- Chat history items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button class="account-info settings-btn" onclick="window.location.href='/settings'">
+                    <div class="avatar">
+                        <img src="{{ url_for('static', filename='images/profile-logo.jpg') }}" alt="HanasanAI" style="width: 32px; height: 32px; border-radius: 50%;">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-email">admin@hanasanai.com</div>
+                        <div class="user-plan">User</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Info Modal -->
+    <div id="modelInfoModal" class="modal-overlay">
+        <div class="model-info-sheet">
+            <button class="model-info-close-btn" id="closeModelInfoBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+            <div class="model-info-content">
+                <div class="model-info-brand">
+                    <img src="{{ url_for('static', filename='img/HanasanAI.svg') }}" alt="HanasanAI" class="info-logo">
+                    <h3 class="app-name">HanasanAI</h3>
+                </div>
+                
+                <div class="model-info-section">
+                    <h4 class="section-title" data-translate="Model Info">Model Info</h4>
+                    
+                    <div class="model-details">
+                        <h2 class="model-name" id="infoModelName">GPT-4o</h2>
+                        <p class="model-tagline" id="infoModelTagline" data-translate="Great for most tasks">Great for most tasks</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="model-features" id="infoModelFeatures">
+                            <div class="feature-item">
+                                <div class="feature-label" data-i18n="Context length:">Context length:</div>
+                                <div class="feature-value" data-i18n="128k tokens">128k tokens</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-label" data-i18n="Strengths:">Strengths:</div>
+                                <div class="feature-value" data-i18n="Reasoning, multilingual, visual understanding">Reasoning, multilingual, visual understanding</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-label" data-i18n="Speed rating:">Speed rating:</div>
+                                <div class="feature-value" data-i18n="Priority">Priority</div>
+                            </div>
+                        </div>
+                        
+                        <button class="docs-link-btn" id="docsLinkBtn">
+                            <span data-i18n="View documentation">View documentation</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 5v2h6.59L4 18.59 5.41 20 17 8.41V15h2V5z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Dialog -->
+    <div id="renameDialog" class="dialog-overlay">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h3 data-translate="Rename Chat">Rename Chat</h3>
+            </div>
+            <div class="dialog-body">
+                <input type="text" id="renameInput" class="dialog-input" placeholder="Enter chat title" data-translate-placeholder="Enter chat title">
+            </div>
+            <div class="dialog-footer">
+                <button class="dialog-btn cancel" id="renameCancelBtn" data-translate="Cancel">Cancel</button>
+                <button class="dialog-btn confirm" id="renameConfirmBtn" data-translate="Rename">Rename</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Dialog -->
+    <div id="deleteDialog" class="dialog-overlay">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h3 data-i18n="delete_chat">Delete Chat</h3>
+            </div>
+            <div class="dialog-body">
+                <p data-i18n="delete_chat_confirm">Are you sure you want to delete this chat?</p>
+                <p class="dialog-warning" data-i18n="delete_chat_warning">Deleted chats cannot be recovered.</p>
+            </div>
+            <div class="dialog-footer">
+                <button class="dialog-btn cancel" id="deleteCancelBtn" data-i18n="cancel">Cancel</button>
+                <button class="dialog-btn delete" id="deleteConfirmBtn" data-i18n="delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/video-call.css') }}">
+    
+    <!-- Character model and background data -->
+    <script>
+        window.SELECTED_VRM = '{{ vrm_file }}';
+        window.SELECTED_BG = '{{ bg_file }}';
+        window.vrm_file = '{{ vrm_file }}';
+        window.bg_file = '{{ bg_file }}';
+    </script>
+    
+    <!-- VRM libraries loaded locally to avoid CDN issues -->
+    
+    <!-- ChatVRM Facial Animation System -->
+    <script src="{{ url_for('static', filename='js/chatvrm-direct-blinking.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatvrm-integration.js') }}"></script>
+    
+    <!-- VRM Character System - ES Module -->
+    <script type="module" src="{{ url_for('static', filename='js/vrm-boot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vrm-expression-ai.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vrm-chat-integration.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/vrma-test-system.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/random-character-handler.js') }}"></script>
+    
+    <!-- Application scripts -->
+    <script src="{{ url_for('static', filename='js/universal-translation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/simple-main.js') }}"></script>
+</body>
+</html>

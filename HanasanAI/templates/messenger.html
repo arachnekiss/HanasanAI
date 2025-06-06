@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HanasanAI Messenger</title>
+    <style>
+        /* Modern Messenger Interface - Line/Telegram Style */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Roboto, sans-serif;
+            background: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .messenger-container {
+            height: 100vh;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            overflow: hidden;
+        }
+        
+        .messenger-header {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
+        }
+        
+        .back-button {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .contact-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .contact-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            padding: 6px;
+        }
+        
+        .contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .contact-details {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-status {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #30d158;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .message.assistant .message-bubble {
+            background: white;
+            color: #1a1a1a;
+            border-bottom-left-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #8e8e93;
+            margin-top: 2px;
+            opacity: 0.7;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+        
+        .typing-bubble {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #007AFF;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .input-area {
+            background: white;
+            padding: 16px;
+            border-top: 1px solid #e9ecef;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 25px;
+            display: flex;
+            align-items: flex-end;
+            min-height: 44px;
+            max-height: 120px;
+            border: 2px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+        
+        .attach-button {
+            background: transparent;
+            border: none;
+            color: #6c757d;
+            font-size: 18px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+        }
+        
+        .attach-button:hover {
+            color: #007AFF;
+            background: rgba(0, 122, 255, 0.1);
+        }
+        
+        .message-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 12px 4px;
+            font-size: 16px;
+            color: #1a1a1a;
+            resize: none;
+            line-height: 20px;
+            max-height: 96px;
+            overflow-y: auto;
+        }
+        
+        .message-input::placeholder {
+            color: #6c757d;
+        }
+        
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+        }
+        
+        .send-button:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Hide scrollbar but allow scrolling */
+        .chat-messages::-webkit-scrollbar,
+        .message-input::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .chat-messages,
+        .message-input {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Voice recording indicator */
+        .voice-recording {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .recording-content {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 280px;
+            text-align: center;
+        }
+        
+        .recording-pulse {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff3b30, #ff6b6b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.5s infinite;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .recording-text {
+            font-size: 18px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .recording-subtext {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Welcome message */
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        
+        .welcome-logo {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+            padding: 10px;
+        }
+        
+        .welcome-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .welcome-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="messenger-container">
+        <!-- Header -->
+        <div class="messenger-header">
+            <button class="back-button" onclick="window.location.href='/'">
+                ←
+            </button>
+            <div class="contact-info">
+                <div class="contact-avatar">
+                    <img src="{{ url_for('static', filename='img/HanasanAI.svg') }}" alt="HanasanAI">
+                </div>
+                <div class="contact-details">
+                    <h1 class="contact-name">HanasanAI</h1>
+                    <p class="contact-status">
+                        <span class="status-dot"></span>
+                        Online
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <div class="welcome-logo">
+                    <img src="{{ url_for('static', filename='img/HanasanAI.svg') }}" alt="HanasanAI">
+                </div>
+                <div class="welcome-title">Chat with HanasanAI</div>
+                <div class="welcome-subtitle">Ask me anything you're curious about!</div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <button class="attach-button" id="attachBtn">📎</button>
+                    <textarea 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="Type a message..."
+                        rows="1"></textarea>
+                </div>
+                <button class="send-button" id="sendBtn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Recording Indicator -->
+    <div class="voice-recording" id="voiceRecording" style="display: none;">
+        <div class="recording-content">
+            <div class="recording-pulse">🎤</div>
+            <div class="recording-text">음성 녹음 중</div>
+            <div class="recording-subtext">버튼을 놓으면 전송됩니다</div>
+        </div>
+    </div>
+
+    <script>
+        class MessengerChat {
+            constructor() {
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.adjustTextareaHeight();
+            }
+
+            setupEventListeners() {
+                const sendBtn = document.getElementById('sendBtn');
+                const messageInput = document.getElementById('messageInput');
+                const attachBtn = document.getElementById('attachBtn');
+
+                // Send message
+                sendBtn.addEventListener('click', () => this.sendMessage());
+                
+                // Enter key handling
+                messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // Input change handling
+                messageInput.addEventListener('input', () => {
+                    this.adjustTextareaHeight();
+                    this.updateSendButton();
+                });
+
+                // Attach button - long press for voice
+                let pressTimer;
+                attachBtn.addEventListener('mousedown', () => {
+                    pressTimer = setTimeout(() => {
+                        this.startVoiceRecording();
+                    }, 500); // 500ms long press
+                });
+
+                attachBtn.addEventListener('mouseup', () => {
+                    clearTimeout(pressTimer);
+                    if (this.isRecording) {
+                        this.stopVoiceRecording();
+                    } else {
+                        this.handleImageAttach();
+                    }
+                });
+
+                attachBtn.addEventListener('mouseleave', () => {
+                    clearTimeout(pressTimer);
+                });
+            }
+
+            adjustTextareaHeight() {
+                const textarea = document.getElementById('messageInput');
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 80) + 'px';
+            }
+
+            updateSendButton() {
+                const sendBtn = document.getElementById('sendBtn');
+                const messageInput = document.getElementById('messageInput');
+                sendBtn.disabled = !messageInput.value.trim();
+                sendBtn.style.background = messageInput.value.trim() ? 'linear-gradient(135deg, #007AFF, #5856D6)' : '#e9ecef';
+            }
+
+            async sendMessage() {
+                const messageInput = document.getElementById('messageInput');
+                const message = messageInput.value.trim();
+                
+                if (!message) return;
+
+                // Add user message
+                this.addMessage(message, 'user');
+                messageInput.value = '';
+                this.adjustTextareaHeight();
+                this.updateSendButton();
+
+                // Show typing indicator
+                this.showTypingIndicator();
+
+                try {
+                    // Send to backend
+                    const response = await fetch('/chat_api', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            session_type: 'messenger'
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Hide typing indicator
+                    this.hideTypingIndicator();
+
+                    if (data.success) {
+                        // Add AI response
+                        this.addMessage(data.response, 'assistant');
+                    } else {
+                        this.addMessage('죄송합니다. 오류가 발생했습니다.', 'assistant');
+                    }
+
+                } catch (error) {
+                    console.error('Message send error:', error);
+                    this.hideTypingIndicator();
+                    this.addMessage('연결 오류가 발생했습니다.', 'assistant');
+                }
+            }
+
+            addMessage(content, role) {
+                const chatMessages = document.getElementById('chatMessages');
+                
+                // Remove welcome message if it exists
+                const welcomeMessage = chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}`;
+                
+                const time = new Date().toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">${content}</div>
+                    <div class="message-time">${time}</div>
+                `;
+
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            showTypingIndicator() {
+                const chatMessages = document.getElementById('chatMessages');
+                
+                // Remove welcome message if it exists
+                const welcomeMessage = chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+                
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'typing-indicator';
+                typingDiv.id = 'typingIndicator';
+                typingDiv.innerHTML = `
+                    <div class="typing-bubble">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                `;
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            handleImageAttach() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.processImageFile(file);
+                    }
+                };
+                input.click();
+            }
+
+            processImageFile(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64 = e.target.result;
+                    this.addImageMessage(base64, file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            addImageMessage(base64, filename) {
+                const chatMessages = document.getElementById('chatMessages');
+                
+                // Remove welcome message if it exists
+                const welcomeMessage = chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user';
+                
+                const time = new Date().toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">
+                        <img src="${base64}" alt="${filename}" style="max-width: 200px; border-radius: 8px; margin-bottom: 4px; display: block;">
+                        ${filename}
+                    </div>
+                    <div class="message-time">${time}</div>
+                `;
+
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            async startVoiceRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+                    this.isRecording = true;
+
+                    document.getElementById('voiceRecording').style.display = 'flex';
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+
+                    this.mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                        this.processVoiceInput(audioBlob);
+                    };
+
+                    this.mediaRecorder.start();
+
+                } catch (error) {
+                    console.error('Voice recording error:', error);
+                    alert('마이크 접근 권한이 필요합니다.');
+                }
+            }
+
+            stopVoiceRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    document.getElementById('voiceRecording').style.display = 'none';
+                }
+            }
+
+            async processVoiceInput(audioBlob) {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'voice.wav');
+
+                try {
+                    const response = await fetch('/transcribe_voice', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const messageInput = document.getElementById('messageInput');
+                        messageInput.value = data.text;
+                        this.adjustTextareaHeight();
+                        this.updateSendButton();
+                        messageInput.focus();
+                    } else {
+                        console.error('Voice transcription failed:', data.error);
+                        alert('음성 인식에 실패했습니다.');
+                    }
+
+                } catch (error) {
+                    console.error('Voice processing error:', error);
+                    alert('음성 처리 중 오류가 발생했습니다.');
+                }
+            }
+        }
+
+        // Initialize messenger when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MessengerChat();
+        });
+    </script>
+</body>
+</html>
