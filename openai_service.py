@@ -15,18 +15,25 @@ class OpenAIService:
     
     def _get_client(self, user=None):
         """Get OpenAI client using user's API key - required for all requests"""
+        import logging
         api_key = None
         
         # Try to get API key from authenticated user
         if user and hasattr(user, 'openai_api_key') and user.openai_api_key:
             api_key = user.openai_api_key
+            logging.debug(f"Using user API key: {api_key[:10]}...")
         else:
             # Try to get API key from session for guest users
             from flask import session
             api_key = session.get('openai_api_key')
+            if api_key:
+                logging.debug(f"Using session API key: {api_key[:10]}...")
+            else:
+                logging.debug("No API key found in session")
         
         if api_key:
             return OpenAI(api_key=api_key)
+        logging.debug("No API key available, returning None")
         return None
         
     def generate_chat_response(self, message, conversation_history=None, custom_instructions=None, user=None):
