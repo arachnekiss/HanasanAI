@@ -846,7 +846,6 @@ def analyze_emotion():
         })
 
 @app.route('/settings/save-api-key', methods=['POST'])
-@login_required
 def save_api_key():
     """Save user's OpenAI API key"""
     try:
@@ -857,8 +856,13 @@ def save_api_key():
         if api_key and not api_key.startswith('sk-'):
             return jsonify({'success': False, 'error': 'Invalid API key format'}), 400
         
-        current_user.openai_api_key = api_key if api_key else None
-        db.session.commit()
+        if current_user.is_authenticated:
+            # Save to user account
+            current_user.openai_api_key = api_key if api_key else None
+            db.session.commit()
+        else:
+            # Save to session for guest users
+            session['openai_api_key'] = api_key if api_key else None
         
         return jsonify({'success': True})
     except Exception as e:
@@ -866,11 +870,18 @@ def save_api_key():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/settings/get-api-key', methods=['GET'])
-@login_required
 def get_api_key():
     """Get user's OpenAI API key (masked for security)"""
     try:
-        api_key = current_user.openai_api_key if hasattr(current_user, 'openai_api_key') else None
+        api_key = None
+        
+        if current_user.is_authenticated:
+            # Get from user account
+            api_key = current_user.openai_api_key if hasattr(current_user, 'openai_api_key') else None
+        else:
+            # Get from session for guest users
+            api_key = session.get('openai_api_key')
+        
         if api_key:
             # Mask the API key for display (show only first 7 and last 4 characters)
             masked_key = api_key[:7] + '...' + api_key[-4:] if len(api_key) > 11 else api_key[:3] + '...'
