@@ -12,6 +12,7 @@ class SimpleChatGPT {
         this.keyboardActive = false;
         this.chatSessions = [];
         this.currentSessionId = null;
+        this.selectedModel = 'gpt-4o'; // Default model
         
         this.init();
     }
@@ -519,7 +520,8 @@ class SimpleChatGPT {
                 },
                 body: JSON.stringify({
                     message: message,
-                    session_id: this.sessionId
+                    session_id: this.sessionId,
+                    model: this.getCurrentSelectedModel()
                 })
             });
             

@@ -102,7 +102,7 @@ class OpenAIService:
             return {
                 'content': response.choices[0].message.content,
                 'tokens_used': response.usage.total_tokens if response.usage else 0,
-                'model_used': model
+                'model_used': selected_model
             }
             
         except Exception as e:
@@ -156,7 +156,7 @@ class OpenAIService:
                 "animation": "idle"
             }
     
-    def analyze_image_with_chat(self, base64_image, message, conversation_history=None, user=None):
+    def analyze_image_with_chat(self, base64_image, message, conversation_history=None, user=None, model=None):
         """Analyze image and generate response"""
         try:
             client = self._get_client(user)
@@ -193,8 +193,14 @@ class OpenAIService:
             
             messages.append({"role": "user", "content": message_content})
             
+            # Use provided model or default to GPT-4o for vision
+            if model:
+                selected_model = self._normalize_model_name(model)
+            else:
+                selected_model = self.chat_model  # Use GPT-4o for vision
+                
             response = client.chat.completions.create(
-                model=self.chat_model,  # Use GPT-4o for vision
+                model=selected_model,
                 messages=messages,
                 max_tokens=600
             )
@@ -202,7 +208,7 @@ class OpenAIService:
             return {
                 'content': response.choices[0].message.content,
                 'tokens_used': response.usage.total_tokens if response.usage else 0,
-                'model_used': self.chat_model
+                'model_used': selected_model
             }
             
         except Exception as e:
