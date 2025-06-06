@@ -511,6 +511,7 @@ class SimpleChatGPT {
         
         try {
             // Call chat API
+            console.log('Sending chat request:', message);
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -522,7 +523,9 @@ class SimpleChatGPT {
                 })
             });
             
+            console.log('Response status:', response.status);
             const data = await response.json();
+            console.log('Response data:', data);
             
             // Hide typing indicator
             this.hideTypingIndicator();
