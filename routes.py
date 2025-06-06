@@ -865,8 +865,8 @@ def save_api_key():
         data = request.get_json()
         api_key = data.get('api_key', '').strip()
         
-        # Validate API key format
-        if api_key and not api_key.startswith('sk-'):
+        # Validate API key format (support both sk- and sk-proj- formats)
+        if api_key and not (api_key.startswith('sk-') or api_key.startswith('sk-proj-')):
             return jsonify({'success': False, 'error': 'Invalid API key format'}), 400
         
         if current_user.is_authenticated:
