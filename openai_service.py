@@ -10,7 +10,7 @@ class OpenAIService:
         # No default API key - users must provide their own
         # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
         # do not change this unless explicitly requested by the user
-        self.chat_model = "gpt-4o"
+        self.chat_model = "gpt-4o-mini"  # Faster and cheaper than gpt-4o
         self.light_model = "gpt-3.5-turbo"
     
     def _get_client(self, user=None):
@@ -92,7 +92,7 @@ class OpenAIService:
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                max_tokens=500,
+                max_tokens=300,  # Reduced for faster responses
                 temperature=0.7
             )
             
