@@ -42,7 +42,7 @@ class OpenAIService:
         logging.debug("No API key available, returning None")
         return None
         
-    def generate_chat_response(self, message, conversation_history=None, custom_instructions=None, user=None):
+    def generate_chat_response(self, message, conversation_history=None, custom_instructions=None, user=None, model=None):
         """Generate a chat response using OpenAI"""
         try:
             client = self._get_client(user)
@@ -86,11 +86,14 @@ class OpenAIService:
             # Add current message
             messages.append({"role": "user", "content": message})
             
-            # Determine model based on complexity
-            model = self._select_model(message, conversation_history)
+            # Use provided model or determine based on complexity
+            if model:
+                selected_model = self._normalize_model_name(model)
+            else:
+                selected_model = self._select_model(message, conversation_history)
             
             response = client.chat.completions.create(
-                model=model,
+                model=selected_model,
                 messages=messages,
                 max_tokens=500,
                 temperature=0.7
@@ -346,6 +349,18 @@ class OpenAIService:
         except Exception as e:
             logging.error(f"Proactive message generation error: {e}")
             return "Hey! How are you doing?"
+    
+    def _normalize_model_name(self, model):
+        """Normalize model names from frontend to OpenAI API format"""
+        model_mapping = {
+            'gpt-4o': 'gpt-4o',
+            'gpt-4o-mini': 'gpt-4o-mini',
+            'o4-mini': 'gpt-4o-mini',
+            'o4-mini-high': 'gpt-4o-mini',
+            'o3': 'gpt-4o',  # Fallback to gpt-4o for o3 until available
+            'gpt-3.5-turbo': 'gpt-3.5-turbo'
+        }
+        return model_mapping.get(model, 'gpt-4o')  # Default to gpt-4o if unknown
     
     def _select_model(self, message, conversation_history):
         """Select appropriate model based on request complexity"""

@@ -224,6 +224,7 @@ def chat_api():
         session_id = data.get('session_id')
         message_type = data.get('type', 'text')
         image_data = data.get('image')
+        selected_model = data.get('model', 'gpt-4o')  # Get selected model from frontend
         
         if not message and not image_data:
             return jsonify({'error': 'Message or image required'}), 400
@@ -258,10 +259,10 @@ def chat_api():
         # Generate AI response
         if image_data:
             # Handle image analysis
-            response_data = openai_service.analyze_image_with_chat(image_data, message, history, current_user if current_user.is_authenticated else None)
+            response_data = openai_service.analyze_image_with_chat(image_data, message, history, current_user if current_user.is_authenticated else None, selected_model)
         else:
-            # Handle text chat - pass current user for custom instructions
-            response_data = openai_service.generate_chat_response(message, history, custom_instructions, current_user if current_user.is_authenticated else None)
+            # Handle text chat - pass current user for custom instructions and selected model
+            response_data = openai_service.generate_chat_response(message, history, custom_instructions, current_user if current_user.is_authenticated else None, selected_model)
         
         # Check if OpenAI service returned an error
         if not response_data.get('content'):
