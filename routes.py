@@ -258,13 +258,20 @@ def chat_api():
         # Generate AI response
         if image_data:
             # Handle image analysis
-            response_data = openai_service.analyze_image_with_chat(image_data, message, history)
+            response_data = openai_service.analyze_image_with_chat(image_data, message, history, current_user if current_user.is_authenticated else None)
         else:
             # Handle text chat - pass current user for custom instructions
             response_data = openai_service.generate_chat_response(message, history, custom_instructions, current_user if current_user.is_authenticated else None)
         
+        # Check if OpenAI service returned an error
+        if not response_data.get('content'):
+            if response_data.get('error'):
+                return jsonify({'error': response_data['error']}), 400
+            else:
+                return jsonify({'error': 'No response from AI service'}), 500
+        
         # Analyze emotion for character animation
-        emotion_data = openai_service.analyze_emotion(message)
+        emotion_data = openai_service.analyze_emotion(message, current_user if current_user.is_authenticated else None)
         
         # Save AI response
         ai_message = ChatMessage()
@@ -278,7 +285,10 @@ def chat_api():
         
         # Update session
         chat_session.last_activity = datetime.utcnow()
-        chat_session.character_emotion = emotion_data.get('emotion', 'neutral')
+        if isinstance(emotion_data, dict):
+            chat_session.character_emotion = emotion_data.get('emotion', 'neutral')
+        else:
+            chat_session.character_emotion = 'neutral'
         
         db.session.commit()
         
