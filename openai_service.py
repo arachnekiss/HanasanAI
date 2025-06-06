@@ -19,23 +19,23 @@ class OpenAIService:
         import os
         api_key = None
         
-        # Try to get API key from authenticated user
-        if user and hasattr(user, 'openai_api_key') and user.openai_api_key:
-            api_key = user.openai_api_key
-            logging.debug(f"Using user API key: {api_key[:10]}...")
+        # Use environment API key
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if api_key:
+            logging.debug("Using environment API key")
         else:
-            # Try to get API key from session for guest users
-            from flask import session
-            api_key = session.get('openai_api_key')
-            if api_key:
-                logging.debug(f"Using session API key: {api_key[:10]}...")
+            # Try to get API key from authenticated user
+            if user and hasattr(user, 'openai_api_key') and user.openai_api_key:
+                api_key = user.openai_api_key
+                logging.debug(f"Using user API key: {api_key[:10]}...")
             else:
-                # Fall back to environment API key for testing
-                api_key = os.environ.get('OPENAI_API_KEY')
+                # Try to get API key from session for guest users
+                from flask import session
+                api_key = session.get('openai_api_key')
                 if api_key:
-                    logging.debug("Using environment API key")
+                    logging.debug(f"Using session API key: {api_key[:10]}...")
                 else:
-                    logging.debug("No API key found in session or environment")
+                    logging.debug("No API key found")
         
         if api_key:
             return OpenAI(api_key=api_key)
