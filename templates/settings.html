@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="settings_title">Settings - HanasanAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-official.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+    <script src="{{ url_for('static', filename='js/global-translation.js') }}"></script>
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <button class="back-btn" onclick="window.location.href='/'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <h1 class="settings-title" data-i18n="settings">Settings</h1>
+        </header>
+
+        <!-- Settings List -->
+        <div class="settings-content">
+            <!-- API Configuration -->
+            <div class="settings-row clickable" onclick="showApiModal()">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label">API Configuration</div>
+                    <div class="settings-value" id="api-status">Not configured</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Email (Disabled) -->
+            <div class="settings-row disabled">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="email">Email</div>
+                    <div class="settings-value">admin@hanasanai.com</div>
+                </div>
+            </div>
+
+
+
+            <!-- Personalization -->
+            <div class="settings-row clickable" onclick="navigateTo('/settings/personalization')">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="personalization">Personalization</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Data Controls -->
+            <div class="settings-row clickable" onclick="navigateTo('/settings/data-controls')">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 17V19H9V17H3ZM3 5V7H13V5H3ZM13 21V19H21V17H13V15H11V21H13ZM7 9V11H3V13H7V15H9V9H7ZM21 13V11H11V13H21ZM15 9H17V7H21V5H17V3H15V9Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="data_controls">Data Controls</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-row clickable" onclick="navigateTo('/settings/notifications')">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13.73 21C13.5542 21.3031 13.3018 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="notifications">Notifications</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Voice -->
+            <div class="settings-row clickable" onclick="navigateTo('/settings/voice')">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 1C12.5523 1 13 1.44772 13 2V10C13 10.5523 12.5523 11 12 11C11.4477 11 11 10.5523 11 10V2C11 1.44772 11.4477 1 12 1Z" fill="currentColor"/>
+                        <path d="M19 10V11C19 15.4183 15.4183 19 11 19V21C16.5228 21 21 16.5228 21 11V10H19Z" fill="currentColor"/>
+                        <path d="M5 10V11C5 15.4183 8.58172 19 13 19V21C7.47715 21 3 16.5228 3 11V10H5Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="voice">Voice</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="settings-row clickable" onclick="navigateTo('/settings/about')">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label" data-i18n="about">About</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="settings-row clickable logout" onclick="logout()">
+                <div class="settings-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#ff4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="16,17 21,12 16,7" stroke="#ff4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="21" y1="12" x2="9" y2="12" stroke="#ff4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="settings-text">
+                    <div class="settings-label logout-text" data-i18n="logout">Logout</div>
+                </div>
+                <div class="settings-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18L15 12L9 6" stroke="#ff4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Configuration Modal -->
+    <div id="apiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>OpenAI API Configuration</h2>
+                <span class="close" onclick="closeApiModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Enter your OpenAI API key to use your own OpenAI account:</p>
+                <div class="input-group">
+                    <label for="apiKeyInput">API Key:</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." maxlength="100">
+                </div>
+                <p class="api-info">
+                    <small>Your API key is stored securely and only used for your requests. Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>.</small>
+                </p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeApiModal()">Cancel</button>
+                    <button type="button" class="btn-primary" onclick="saveApiKey()">Save</button>
+                    <button type="button" class="btn-danger" onclick="removeApiKey()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="customAlert" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <div id="alertIcon" style="font-size: 24px; font-weight: bold; margin-right: 12px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1);">i</div>
+                <div id="alertMessage" style="flex: 1; text-align: left;">Message</div>
+            </div>
+            <div style="text-align: right;">
+                <button onclick="closeCustomAlert()" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="customConfirm" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #f59e0b; margin-right: 12px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(245,158,11,0.1);">?</div>
+                <div id="confirmMessage" style="flex: 1; text-align: left;">Are you sure?</div>
+            </div>
+            <div style="text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="confirmNo" class="btn btn-secondary">Cancel</button>
+                <button id="confirmYes" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+    <script>
+        // API Modal functionality
+        function showApiModal() {
+            document.getElementById('apiModal').style.display = 'block';
+            loadCurrentApiKey();
+        }
+
+        function closeApiModal() {
+            document.getElementById('apiModal').style.display = 'none';
+            document.getElementById('apiKeyInput').value = '';
+        }
+
+        async function loadCurrentApiKey() {
+            try {
+                const response = await fetch('/settings/get-api-key');
+                const data = await response.json();
+                if (data.success && data.has_key) {
+                    document.getElementById('apiKeyInput').placeholder = data.api_key;
+                    document.getElementById('api-status').textContent = 'Configured';
+                } else {
+                    document.getElementById('api-status').textContent = 'Not configured';
+                }
+            } catch (error) {
+                console.error('Error loading API key:', error);
+            }
+        }
+
+        async function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                showCustomAlert('Please enter an API key');
+                return;
+            }
+
+            try {
+                const response = await fetch('/settings/save-api-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ api_key: apiKey })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showCustomAlert('API key saved successfully', 'success');
+                    closeApiModal();
+                    loadCurrentApiKey();
+                } else {
+                    showCustomAlert('Error saving API key: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving API key:', error);
+                showCustomAlert('Error saving API key', 'error');
+            }
+        }
+
+        async function removeApiKey() {
+            showCustomConfirm('Are you sure you want to remove your API key?', async function() {
+                try {
+                    const response = await fetch('/settings/save-api-key', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ api_key: '' })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showCustomAlert('API key removed successfully', 'success');
+                        closeApiModal();
+                        loadCurrentApiKey();
+                    } else {
+                        showCustomAlert('Error removing API key: ' + data.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error removing API key:', error);
+                    showCustomAlert('Error removing API key', 'error');
+                }
+            });
+        }
+
+        // Custom Alert Modal
+        function showCustomAlert(message, type = 'info') {
+            const alertModal = document.getElementById('customAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            const alertIcon = document.getElementById('alertIcon');
+            
+            alertMessage.textContent = message;
+            
+            // Set icon based on type
+            if (type === 'success') {
+                alertIcon.innerHTML = '✓';
+                alertIcon.style.color = '#10b981';
+            } else if (type === 'error') {
+                alertIcon.innerHTML = '!';
+                alertIcon.style.color = '#ef4444';
+            } else {
+                alertIcon.innerHTML = 'i';
+                alertIcon.style.color = '#3b82f6';
+            }
+            
+            alertModal.style.display = 'block';
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
+        // Custom Confirm Modal
+        function showCustomConfirm(message, callback) {
+            const confirmModal = document.getElementById('customConfirm');
+            const confirmMessage = document.getElementById('confirmMessage');
+            
+            confirmMessage.textContent = message;
+            confirmModal.style.display = 'block';
+            
+            // Set up callbacks
+            document.getElementById('confirmYes').onclick = function() {
+                closeCustomConfirm();
+                callback();
+            };
+            
+            document.getElementById('confirmNo').onclick = function() {
+                closeCustomConfirm();
+            };
+        }
+
+        function closeCustomConfirm() {
+            document.getElementById('customConfirm').style.display = 'none';
+        }
+
+        // Load API status on page load
+        document.addEventListener('DOMContentLoaded', loadCurrentApiKey);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const apiModal = document.getElementById('apiModal');
+            const alertModal = document.getElementById('customAlert');
+            const confirmModal = document.getElementById('customConfirm');
+            
+            if (event.target == apiModal) {
+                closeApiModal();
+            } else if (event.target == alertModal) {
+                closeCustomAlert();
+            } else if (event.target == confirmModal) {
+                closeCustomConfirm();
+            }
+        }
+    </script>
+</body>
+</html>
