@@ -112,6 +112,21 @@ HanasanAI/
 - **Messenger**: Clean text-based interface
 - **Video Call**: AI character video call simulation
 
+## Large File Handling
+
+This repository contains VRM character models (50MB+) that may cause slower clone times. The application works perfectly with these files, but for optimal Git performance:
+
+**Recommended**: Use Git LFS for handling large VRM files
+```bash
+git lfs install
+git clone https://github.com/arachnekiss/HanasanAI.git
+```
+
+**Alternative**: Standard clone (works but may be slower)
+```bash
+git clone https://github.com/arachnekiss/HanasanAI.git
+```
+
 ## Contributing
 
 1. Fork the repository

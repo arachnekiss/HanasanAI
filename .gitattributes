@@ -1,0 +1,9 @@
+# VRM model files - large binary files
+*.vrm filter=lfs diff=lfs merge=lfs -text
+*.vrma filter=lfs diff=lfs merge=lfs -text
+
+# Other large assets
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.png binary
+*.jpg binary
+*.jpeg binary
